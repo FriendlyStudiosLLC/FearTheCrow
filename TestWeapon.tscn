@@ -1,0 +1,19 @@
+[gd_scene load_steps=6 format=3 uid="uid://ckda7jn2oevmr"]
+
+[ext_resource type="Script" path="res://Scripts/Weapon/Weapon.cs" id="1_5vaeu"]
+[ext_resource type="Script" path="res://Scripts/Weapon/WeaponTrigger.cs" id="2_fcgrb"]
+[ext_resource type="Script" path="res://Scripts/Weapon/WeaponFeature.cs" id="3_h8x1n"]
+
+[sub_resource type="Resource" id="Resource_j4ox1"]
+script = ExtResource("2_fcgrb")
+Type = 2
+Modifier = 1
+
+[sub_resource type="Resource" id="Resource_qvsuf"]
+script = ExtResource("3_h8x1n")
+Type = 0
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_5vaeu")
+Triggers = Array[Object]([SubResource("Resource_j4ox1")])
+Features = Array[Object]([SubResource("Resource_qvsuf")])
