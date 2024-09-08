@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using FearTheCrow.Scripts.Weapon;
 using Mathf = Godot.Mathf;
 
 public partial class Player : CharacterBody3D
@@ -9,6 +10,7 @@ public partial class Player : CharacterBody3D
 	[Export] private float _eyeHeight;
 	[Export] private float _capsuleHeight = 2.0f;
 	[Export] private float _capsuleRadius = 0.5f;
+	[Export] private float _mass = 10f;
 
 	[ExportCategory("Ground Movement Settings")] 
 	[Export] private float _walkSpeed = 7.0f;
@@ -64,6 +66,8 @@ public partial class Player : CharacterBody3D
 	[Export] private Node3D _headOriginalPosition;
 	[Export] private Node3D _head;
 	[Export] private Node3D _cameraSmooth;
+	
+	[Export] private WeaponManager _weaponManager;
 
 	private Vector2 _inputDir;
 	private Vector3 _wishDir;
@@ -85,6 +89,9 @@ public partial class Player : CharacterBody3D
 	public override void _Ready()
 	{
 		SetMouseMode(DisplayServer.MouseMode.Captured);
+
+		_weaponManager.Connect("WeaponChanged", new Callable(this, nameof(SwitchWeapon)));
+
 	}
 
 	public override void _Process(double delta)
@@ -137,7 +144,7 @@ public partial class Player : CharacterBody3D
 		SmoothCamera(delta);
 	}
 
-	void SwitchWeapon(int index)
+	void SwitchWeapon(Weapon newWeapon)
 	{
 		
 	}
@@ -153,32 +160,91 @@ public partial class Player : CharacterBody3D
 	
 	public override void _UnhandledInput(InputEvent @event)
 	{
-		if (Input.IsActionPressed("Pause")) GetTree().Quit();
+		if (Input.IsActionPressed("Pause")) 
+			GetTree().Quit();
 
+		// Handle Mouse Motion
 		if (@event is InputEventMouseMotion eventMouseMotion)
 		{
-			RotateY(-eventMouseMotion.GetRelative().X * _lookSensitivity);
-			_camera.RotateX(-eventMouseMotion.GetRelative().Y * _lookSensitivity);
-			float camX = IsOnFloor() ? Mathf.Clamp(_camera.GetRotation().X, Mathf.DegToRad(-90.0f), Mathf.DegToRad(90.0f)) : _camera.GetRotation().X;
-			_camera.SetRotation(new Vector3(camX, _camera.GetRotation().Y, _camera.GetRotation().Z));
+			_HandleMouseLook(eventMouseMotion);
 		}
 
-		if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
+		// Handle Mouse Button Events
+		if (@event is InputEventMouseButton mouseEvent)
 		{
-			if(mouseEvent.GetButtonIndex() == MouseButton.WheelUp) _noclipSpeedMult = Mathf.Min(100.0f, _noclipSpeedMult * 1.1f);
-			if(mouseEvent.GetButtonIndex() == MouseButton.WheelDown) _noclipSpeedMult = Mathf.Max(0.1f, _noclipSpeedMult * 0.9f);
+			_HandleMouseButton(mouseEvent);
 		}
+	}
 
-		if (Input.IsActionJustReleased("Weapon_1"))
-			SwitchWeapon(1);
-		if (Input.IsActionJustPressed("Weapon_2"))
-			SwitchWeapon(2);
-		if (Input.IsActionJustReleased("Weapon_3"))
-			SwitchWeapon(3);
-		if (Input.IsActionJustPressed("Weapon_4"))
-			SwitchWeapon(4);
-		if (Input.IsActionJustPressed("Weapon_5"))
-			SwitchWeapon(5);
+	public override void _Input(InputEvent @event)
+	{
+		// Handle Weapon Switching
+		_HandleWeaponSwitch(@event);
+	}
+	
+	private void _HandleWeaponSwitch(InputEvent @event)
+	{
+		if (Input.IsActionPressed("Weapon_1"))
+			_weaponManager.EquipWeapon(0);
+		if (Input.IsActionPressed("Weapon_2"))
+			_weaponManager.EquipWeapon(1);
+		if (Input.IsActionPressed("Weapon_3"))
+			_weaponManager.EquipWeapon(2);
+		if (Input.IsActionPressed("Weapon_4"))
+			_weaponManager.EquipWeapon(3);
+		if (Input.IsActionPressed("Weapon_5"))
+			_weaponManager.EquipWeapon(4);
+	}
+
+// Extracted functions for better organization
+
+	private void _HandleMouseLook(InputEventMouseMotion eventMouseMotion)
+	{
+		RotateY(-eventMouseMotion.GetRelative().X * _lookSensitivity);
+		_camera.RotateX(-eventMouseMotion.GetRelative().Y * _lookSensitivity);
+		float camX = IsOnFloor() ? Mathf.Clamp(_camera.GetRotation().X, Mathf.DegToRad(-90.0f), Mathf.DegToRad(90.0f)) : _camera.GetRotation().X;
+		_camera.SetRotation(new Vector3(camX, _camera.GetRotation().Y, _camera.GetRotation().Z));
+	}
+
+	private void _HandleMouseButton(InputEventMouseButton mouseEvent)
+	{
+		if (mouseEvent.Pressed)
+		{
+			if (mouseEvent.GetButtonIndex() == MouseButton.WheelUp)
+				_noclipSpeedMult = Mathf.Min(100.0f, _noclipSpeedMult * 1.1f);
+			if (mouseEvent.GetButtonIndex() == MouseButton.WheelDown)
+				_noclipSpeedMult = Mathf.Max(0.1f, _noclipSpeedMult * 0.9f);
+
+			if (mouseEvent.ButtonIndex == MouseButton.Left)
+			{
+				if (_weaponManager.GetCurrentWeapon() != null)
+					_weaponManager.GetCurrentWeapon().ProcessPrimary();
+			}
+			// ... handle other mouse button presses
+		}
+		else if (mouseEvent.IsReleased())
+		{
+			if (mouseEvent.ButtonIndex == MouseButton.Left)
+			{
+				if (_weaponManager.GetCurrentWeapon() != null)
+					_weaponManager.GetCurrentWeapon().ResetFire();
+			}
+		}
+	}
+
+	public void ApplyImpulse(Vector3 impulse, Vector3 position)
+	{
+		// Calculate the relative position of the impulse to the player's center of mass
+		Vector3 relativePosition = position - GlobalTransform.Origin;
+
+		// Calculate the torque (rotational force) caused by the impulse
+		Vector3 torque = relativePosition.Cross(impulse);
+
+		// Apply the impulse to the player's linear velocity
+		Velocity += impulse / _mass; // Mass is a property of CharacterBody3D
+
+		// Apply the torque to the player's angular velocity (if desired)
+		// AngularVelocity += _inverse_inertia_tensor.Xform(torque); // Uncomment if you want rotational effects
 	}
 
 	void _handle_ground_physics(double delta)

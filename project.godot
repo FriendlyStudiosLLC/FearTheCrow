@@ -19,7 +19,11 @@ config/icon="res://icon.svg"
 
 [dotnet]
 
-project/assembly_name="Project"
+project/assembly_name="FearTheCrow"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/goshapes/plugin.cfg")
 
 [global_group]
 
