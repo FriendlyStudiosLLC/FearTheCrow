@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_bqchd"]
 [ext_resource type="Script" path="res://Scripts/Weapon/WeaponManager.cs" id="2_w8xyd"]
-[ext_resource type="PackedScene" uid="uid://bccd5y3mp2e7" path="res://Prefabs/Weapons/Revolver.tscn" id="3_j61qw"]
+[ext_resource type="PackedScene" uid="uid://yugdxt87orpo" path="res://Prefabs/Weapons/Shotgun.tscn" id="3_vcvou"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xohxy"]
 height = 1.778
@@ -45,10 +45,11 @@ current = true
 [node name="WeaponMarker" type="Marker3D" parent="HeadOrigin/Head/Camera Smooth/Camera3D" node_paths=PackedStringArray("Weapons", "PlayerCamera", "Player")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.145, -0.15, -0.1)
 script = ExtResource("2_w8xyd")
-Weapons = [NodePath("Revolver")]
+Weapons = [NodePath("Shotgun")]
 PlayerCamera = NodePath("..")
 Player = NodePath("../../../../..")
 
-[node name="Revolver" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_j61qw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.04)
-PlayerRecoilFactor = 0.001
+[node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_vcvou")]
+FireType = 1
+BaseSprayRadius = 30.0
+PlayerRecoilFactor = 0.088
