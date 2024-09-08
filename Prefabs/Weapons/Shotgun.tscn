@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://ircwv7mhclq0"]
+
+[ext_resource type="Script" path="res://Scripts/Weapon/Weapon.cs" id="1_irvy8"]
+[ext_resource type="PackedScene" uid="uid://cjqnxqtdtsvt" path="res://Prefabs/World/Bullethole_Default.tscn" id="2_vv8j3"]
+[ext_resource type="PackedScene" uid="uid://dpogyhm4i5pkd" path="res://Prefabs/Weapons/Pistol/SM_Pistol.tscn" id="3_2dfoj"]
+
+[node name="Revolver" type="Node3D"]
+script = ExtResource("1_irvy8")
+Modifiers = Array[Resource]([])
+FireType = 4
+Bullethole = ExtResource("2_vv8j3")
+
+[node name="SM_Pistol" parent="." instance=ExtResource("3_2dfoj")]
