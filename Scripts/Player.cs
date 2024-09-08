@@ -58,16 +58,6 @@ public partial class Player : CharacterBody3D
 	[Export] private float _slideFriction = 8.0f;
 	private bool _isSliding = false;
 
-	[ExportCategory("Wall Run Settings")]
-	[Export] private float _wallRunSpeed = 10.0f;
-	[Export] private float _wallRunGravity = 5.0f;
-	[Export] private float _wallRunJumpForce = 10.0f;
-	[Export] public NodePath LeftWallRayPath;
-	[Export] public NodePath RightWallRayPath;
-	private RayCast3D _leftWallRay;
-	private RayCast3D _rightWallRay;
-	private bool _isWallRunning = false;
-
 	
 	//TODO: Ladder Settings
 	
@@ -107,9 +97,6 @@ public partial class Player : CharacterBody3D
 		SetMouseMode(DisplayServer.MouseMode.Captured);
 
 		_weaponManager.Connect("WeaponChanged", new Callable(this, nameof(SwitchWeapon)));
-		
-		_leftWallRay = GetNode<RayCast3D>(LeftWallRayPath);
-		_rightWallRay = GetNode<RayCast3D>(RightWallRayPath);
 
 	}
 
@@ -271,11 +258,14 @@ public partial class Player : CharacterBody3D
 		float fDelta = (float)delta;
 
 		// Sliding
-		if (_isCrouched && _inputDir.Length() > 0.5f && Velocity.Length() > _walkSpeed && !_isSliding) // Initiate slide
+		if (_isCrouched && _inputDir.Length() > 0.5f && !_isSliding) 
 		{
-			_isSliding = true;
-			Velocity = Velocity.Slide(GetFloorNormal()); 
-			Velocity = Velocity.Normalized() * _slideSpeed;
+			if (IsOnFloor()) // Check if the player is on the floor
+			{
+				_isSliding = true;
+				Velocity = Velocity.Slide(GetFloorNormal()); 
+				Velocity = Velocity.Normalized() * _slideSpeed; // Slide at sprint speed
+			}
 		}
 
 		if (_isSliding)
@@ -283,8 +273,8 @@ public partial class Player : CharacterBody3D
 			// Apply friction while sliding
 			Velocity = Velocity.Lerp(Vector3.Zero, _slideFriction * fDelta);
 
-			// End slide if player stops moving or uncrouches
-			if (_inputDir.Length() < 0.5f || !_isCrouched)
+			// End slide if player stops moving, uncrouches, or is no longer on the floor
+			if (_inputDir.Length() < 0.5f || !_isCrouched || !IsOnFloor())
 			{
 				_isSliding = false;
 			}
@@ -316,6 +306,7 @@ public partial class Player : CharacterBody3D
 
 	void _headbob_effect(float delta)
 	{
+		if (_isSliding) return;
 		_headbobTime += delta * GetVelocity().Length();
 		Transform3D _t = _camera.GetTransform();
 		Vector3 o;
@@ -338,44 +329,19 @@ public partial class Player : CharacterBody3D
 		float fDelta = (float)delta;
 		Velocity = Velocity - Vector3.Up * _gravity * fDelta; // Apply gravity
 
-		// Wall running
-		if (!_isWallRunning && _inputDir.Length() > 0 && IsOnWall())
+		float cur_speed_in_wish_dir = Velocity.Dot(_wishDir);
+		float add_speed_till_cap = get_move_speed() - cur_speed_in_wish_dir;
+		if (add_speed_till_cap > 0)
 		{
-			var wallNormal = GetWallNormal();
-			if (!IsSurfaceTooSteep(wallNormal)) 
-			{
-				_isWallRunning = true;
-				Velocity = wallNormal.Cross(Vector3.Up) * _wallRunSpeed * _inputDir.X;
-				Vector3 v = GetVelocity();
-				v.Y = -_wallRunGravity * fDelta; 
-				SetVelocity(v);
-			}
+			float accel_speed = _airAccel * _airMoveSpeed * fDelta;
+			accel_speed = Mathf.Min(accel_speed, add_speed_till_cap);
+			Velocity += accel_speed * _wishDir;
 		}
 
-		if (_isWallRunning)
+		if (IsOnWall())
 		{
-			if (Input.IsActionJustPressed("Jump") || !(_inputDir.Length() > 0) || !IsOnWall())
-			{
-				_isWallRunning = false;
-				Velocity += Vector3.Up * _wallRunJumpForce; 
-			}
-		}
-		else // Normal air movement
-		{
-			float cur_speed_in_wish_dir = Velocity.Dot(_wishDir);
-			float add_speed_till_cap = get_move_speed() - cur_speed_in_wish_dir;
-			if (add_speed_till_cap > 0)
-			{
-				float accel_speed = _airAccel * _airMoveSpeed * fDelta;
-				accel_speed = Mathf.Min(accel_speed, add_speed_till_cap);
-				Velocity += accel_speed * _wishDir;
-			}
-
-			if (IsOnWall())
-			{
-				SetMotionMode(IsSurfaceTooSteep(GetWallNormal()) ? MotionModeEnum.Floating : MotionModeEnum.Grounded); 
-				clip_velocity(GetWallNormal(), _overbounce, fDelta); 
-			}
+			SetMotionMode(IsSurfaceTooSteep(GetWallNormal()) ? MotionModeEnum.Floating : MotionModeEnum.Grounded); 
+			clip_velocity(GetWallNormal(), _overbounce, fDelta); 
 		}
 	}
 

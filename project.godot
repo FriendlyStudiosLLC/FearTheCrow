@@ -23,7 +23,7 @@ project/assembly_name="FearTheCrow"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/goshapes/plugin.cfg")
+enabled=PackedStringArray()
 
 [global_group]
 

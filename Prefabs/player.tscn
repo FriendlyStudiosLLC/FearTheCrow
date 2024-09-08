@@ -13,8 +13,8 @@ _airCap = 0.85
 _airAccel = 1.8
 _overbounce = 0.9
 _speedJumpMult = 2.0
-LeftWallRayPath = NodePath("LeftWallRay")
-RightWallRayPath = NodePath("RightWallRay")
+_slideSpeed = 24.0
+_slideFriction = 1.0
 _camera = NodePath("HeadOrigin/Head/Camera Smooth/Camera3D")
 _stepDownRay = NodePath("StepDownRay")
 _stepAheadRay = NodePath("StepAheadRay")
@@ -29,12 +29,6 @@ _weaponManager = NodePath("HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker")
 [node name="StepAheadRay" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -0.55)
 target_position = Vector3(0, -0.55, 0)
-
-[node name="LeftWallRay" type="RayCast3D" parent="."]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
-
-[node name="RightWallRay" type="RayCast3D" parent="."]
-transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
