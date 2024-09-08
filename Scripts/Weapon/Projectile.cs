@@ -13,10 +13,13 @@ public partial class Projectile : RigidBody3D
 
     public override void _Ready()
     {
-        // Apply initial velocity based on the direction it was fired in
-        // (Assuming you set the projectile's rotation in ProjectileFire())
-        LinearVelocity = -GlobalTransform.Basis.Z * Speed; 
+        // Get the direction the projectile was fired in
+        var direction = GlobalTransform.Basis.Z;
+
+        // Apply initial velocity in the opposite direction of the firing direction
+        LinearVelocity = -direction * Speed;
     }
+
 
     public override void _PhysicsProcess(double delta)
     {

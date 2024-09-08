@@ -231,17 +231,22 @@ public partial class Weapon : Node3D
 	private void ProjectileFire()
 	{
 		var cam = GetPlayerCamera(); // Consider making this more flexible
+		var viewport = GetViewport();
 
-		var Center = GetViewport().GetTexture().GetSize() / 2;
-		var RayOrigin = cam.ProjectRayOrigin(Center);
-		var RayDirection = cam.ProjectRayNormal(Center);
+		// Calculate the ray origin and direction based on the viewport center
+		var viewportSize = viewport.GetTexture().GetSize();
+		var viewportCenter = viewportSize / 2;
+		var rayOrigin = cam.ProjectRayOrigin(viewportCenter);
+		var rayDirection = cam.ProjectRayNormal(viewportCenter).Normalized(); // Ensure normalized direction
+		var rayEnd = rayOrigin + rayDirection * BaseMaxRange;
 
-		// Instantiate a projectile 
+		// Instantiate the projectile and set its properties
 		var projectile = Projectile.Instantiate<Projectile>();
-		GetParent().AddChild(projectile);
+		GetTree().Root.AddChild(projectile);
 
-		// Set projectile's position and rotation
-		projectile.GlobalTransform = new Transform3D(Basis.LookingAt(-RayDirection, Vector3.Up), RayOrigin); 
+		// Set the projectile's position and rotation
+		projectile.GlobalTransform = new Transform3D(Basis.LookingAt(rayDirection, Vector3.Up), rayOrigin);
+		projectile.LinearVelocity = rayDirection * projectile.Speed;
 
 		// Play muzzle flash, sound effects, etc.
 	}

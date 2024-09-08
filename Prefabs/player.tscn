@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://cneco1q2ups5j"]
+[gd_scene load_steps=6 format=3 uid="uid://cneco1q2ups5j"]
 
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_bqchd"]
 [ext_resource type="Script" path="res://Scripts/Weapon/WeaponManager.cs" id="2_w8xyd"]
 [ext_resource type="PackedScene" uid="uid://yugdxt87orpo" path="res://Prefabs/Weapons/Shotgun.tscn" id="3_vcvou"]
+[ext_resource type="PackedScene" uid="uid://cojmn8svf3i17" path="res://Prefabs/Weapons/Projectile.tscn" id="4_7khf7"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xohxy"]
 height = 1.778
@@ -51,5 +52,6 @@ Player = NodePath("../../../../..")
 
 [node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_vcvou")]
 FireType = 1
+Projectile = ExtResource("4_7khf7")
 BaseSprayRadius = 30.0
 PlayerRecoilFactor = 0.088
