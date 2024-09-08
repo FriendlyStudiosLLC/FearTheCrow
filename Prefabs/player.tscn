@@ -1,9 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cneco1q2ups5j"]
+[gd_scene load_steps=5 format=3 uid="uid://cneco1q2ups5j"]
 
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_bqchd"]
 [ext_resource type="Script" path="res://Scripts/Weapon/WeaponManager.cs" id="2_w8xyd"]
-[ext_resource type="PackedScene" uid="uid://yugdxt87orpo" path="res://Prefabs/Weapons/Shotgun.tscn" id="3_vcvou"]
-[ext_resource type="PackedScene" uid="uid://cojmn8svf3i17" path="res://Prefabs/Weapons/Projectile.tscn" id="4_7khf7"]
+[ext_resource type="PackedScene" uid="uid://ircwv7mhclq0" path="res://Prefabs/Weapons/Shotgun.tscn" id="3_co0g2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xohxy"]
 height = 1.778
@@ -14,6 +13,8 @@ _airCap = 0.85
 _airAccel = 1.8
 _overbounce = 0.9
 _speedJumpMult = 2.0
+LeftWallRayPath = NodePath("LeftWallRay")
+RightWallRayPath = NodePath("RightWallRay")
 _camera = NodePath("HeadOrigin/Head/Camera Smooth/Camera3D")
 _stepDownRay = NodePath("StepDownRay")
 _stepAheadRay = NodePath("StepAheadRay")
@@ -28,6 +29,12 @@ _weaponManager = NodePath("HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker")
 [node name="StepAheadRay" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, -0.55)
 target_position = Vector3(0, -0.55, 0)
+
+[node name="LeftWallRay" type="RayCast3D" parent="."]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="RightWallRay" type="RayCast3D" parent="."]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
@@ -50,8 +57,4 @@ Weapons = [NodePath("Shotgun")]
 PlayerCamera = NodePath("..")
 Player = NodePath("../../../../..")
 
-[node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_vcvou")]
-FireType = 1
-Projectile = ExtResource("4_7khf7")
-BaseSprayRadius = 30.0
-PlayerRecoilFactor = 0.088
+[node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_co0g2")]

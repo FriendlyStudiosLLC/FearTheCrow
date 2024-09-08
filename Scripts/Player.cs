@@ -53,6 +53,22 @@ public partial class Player : CharacterBody3D
 	[Export] private bool _snappedToStairsLastFrame = false;
 	private UInt64 _lastFrameWasOnFloor;
 	
+	[ExportCategory("Slide Settings")]
+	[Export] private float _slideSpeed = 12.0f;
+	[Export] private float _slideFriction = 8.0f;
+	private bool _isSliding = false;
+
+	[ExportCategory("Wall Run Settings")]
+	[Export] private float _wallRunSpeed = 10.0f;
+	[Export] private float _wallRunGravity = 5.0f;
+	[Export] private float _wallRunJumpForce = 10.0f;
+	[Export] public NodePath LeftWallRayPath;
+	[Export] public NodePath RightWallRayPath;
+	private RayCast3D _leftWallRay;
+	private RayCast3D _rightWallRay;
+	private bool _isWallRunning = false;
+
+	
 	//TODO: Ladder Settings
 	
 	//TODO: Swim Settings
@@ -91,6 +107,9 @@ public partial class Player : CharacterBody3D
 		SetMouseMode(DisplayServer.MouseMode.Captured);
 
 		_weaponManager.Connect("WeaponChanged", new Callable(this, nameof(SwitchWeapon)));
+		
+		_leftWallRay = GetNode<RayCast3D>(LeftWallRayPath);
+		_rightWallRay = GetNode<RayCast3D>(RightWallRayPath);
 
 	}
 
@@ -250,32 +269,49 @@ public partial class Player : CharacterBody3D
 	void _handle_ground_physics(double delta)
 	{
 		float fDelta = (float)delta;
-		float curSpeedInWishDir = GetVelocity().Dot(_wishDir);
-		float addSpeedTilCap = get_move_speed() - curSpeedInWishDir;
-		Vector3 v;
-		if (addSpeedTilCap > 0)
+
+		// Sliding
+		if (_isCrouched && _inputDir.Length() > 0.5f && Velocity.Length() > _walkSpeed && !_isSliding) // Initiate slide
 		{
-			float accelSpeed = _groundAccel * fDelta * get_move_speed();
-			accelSpeed = Mathf.Min(accelSpeed, addSpeedTilCap);
-			v = GetVelocity();
-			v += accelSpeed * _wishDir;
-			SetVelocity(v);
+			_isSliding = true;
+			Velocity = Velocity.Slide(GetFloorNormal()); 
+			Velocity = Velocity.Normalized() * _slideSpeed;
 		}
-		
-		//ApplyFriction
-		float control = Mathf.Max(GetVelocity().Length(), _groundDecel);
-		float drop = control * _groundDecel * fDelta;
-		float newSpeed = Mathf.Max(GetVelocity().Length() - drop, 0.0f);
-		if (GetVelocity().Length() > 0)
+
+		if (_isSliding)
 		{
-			newSpeed /= GetVelocity().Length();
+			// Apply friction while sliding
+			Velocity = Velocity.Lerp(Vector3.Zero, _slideFriction * fDelta);
+
+			// End slide if player stops moving or uncrouches
+			if (_inputDir.Length() < 0.5f || !_isCrouched)
+			{
+				_isSliding = false;
+			}
 		}
-		v = GetVelocity();
-		v *= newSpeed;
-		SetVelocity(v);
+		else // Normal ground movement
+		{
+			float curSpeedInWishDir = Velocity.Dot(_wishDir);
+			float addSpeedTilCap = get_move_speed() - curSpeedInWishDir;
+			if (addSpeedTilCap > 0)
+			{
+				float accelSpeed = _groundAccel * fDelta * get_move_speed();
+				accelSpeed = Mathf.Min(accelSpeed, addSpeedTilCap);
+				Velocity += accelSpeed * _wishDir;
+			}
+
+			// Apply friction
+			float control = Mathf.Max(Velocity.Length(), _groundDecel);
+			float drop = control * _groundDecel * fDelta;
+			float newSpeed = Mathf.Max(Velocity.Length() - drop, 0.0f);
+			if (Velocity.Length() > 0)
+			{
+				newSpeed /= Velocity.Length();
+			}
+			Velocity *= newSpeed;
+		}
 
 		_headbob_effect(fDelta);
-
 	}
 
 	void _headbob_effect(float delta)
@@ -300,23 +336,47 @@ public partial class Player : CharacterBody3D
 	void _handle_air_physics(double delta)
 	{
 		float fDelta = (float)delta;
-		Vector3 v = GetVelocity();
-		v.Y -= _gravity * fDelta;
-		SetVelocity(v);
-		float cur_speed_in_wish_dir = GetVelocity().Dot(_wishDir);
-		float add_speed_till_cap = get_move_speed() - cur_speed_in_wish_dir;
-		if(add_speed_till_cap > 0)
+		Velocity = Velocity - Vector3.Up * _gravity * fDelta; // Apply gravity
+
+		// Wall running
+		if (!_isWallRunning && _inputDir.Length() > 0 && IsOnWall())
 		{
-			float accel_speed = _airAccel * _airMoveSpeed * fDelta;
-			accel_speed = Mathf.Min(accel_speed, add_speed_till_cap);
-			v += accel_speed * _wishDir;
-			SetVelocity(v);
+			var wallNormal = GetWallNormal();
+			if (!IsSurfaceTooSteep(wallNormal)) 
+			{
+				_isWallRunning = true;
+				Velocity = wallNormal.Cross(Vector3.Up) * _wallRunSpeed * _inputDir.X;
+				Vector3 v = GetVelocity();
+				v.Y = -_wallRunGravity * fDelta; 
+				SetVelocity(v);
+			}
 		}
 
-		if (!IsOnWall()) return;
-		SetMotionMode(IsSurfaceTooSteep(GetWallNormal()) ? MotionModeEnum.Floating : MotionModeEnum.Grounded); // Enables smoother surf movement
-		clip_velocity(GetWallNormal(), _overbounce, fDelta);  // Clip velocity for surf
+		if (_isWallRunning)
+		{
+			if (Input.IsActionJustPressed("Jump") || !(_inputDir.Length() > 0) || !IsOnWall())
+			{
+				_isWallRunning = false;
+				Velocity += Vector3.Up * _wallRunJumpForce; 
+			}
+		}
+		else // Normal air movement
+		{
+			float cur_speed_in_wish_dir = Velocity.Dot(_wishDir);
+			float add_speed_till_cap = get_move_speed() - cur_speed_in_wish_dir;
+			if (add_speed_till_cap > 0)
+			{
+				float accel_speed = _airAccel * _airMoveSpeed * fDelta;
+				accel_speed = Mathf.Min(accel_speed, add_speed_till_cap);
+				Velocity += accel_speed * _wishDir;
+			}
 
+			if (IsOnWall())
+			{
+				SetMotionMode(IsSurfaceTooSteep(GetWallNormal()) ? MotionModeEnum.Floating : MotionModeEnum.Grounded); 
+				clip_velocity(GetWallNormal(), _overbounce, fDelta); 
+			}
+		}
 	}
 
 	void _handle_controller_look_input(double delta)
