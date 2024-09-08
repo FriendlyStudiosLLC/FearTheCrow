@@ -29,13 +29,14 @@ public partial class Weapon : Node3D
 	[Export] public float BaseSprayRadius = 0.125f;
 	[Export] public float BaseMaxRange = 1000;
 	[Export] public PackedScene Bullethole;
-	[Export] public float ImpactForce = 75.0f;
-	[Export] public float PlayerRecoilFactor = 75.0f;
+	[Export] public float ImpactForce = 1.0f;
+	[Export] public float PlayerRecoilFactor = 5f;
 	[Export] public bool Multi = false;
 	private bool _isFiringFullAuto = false; 
 
 	private Task _fullAutoTask;
 	private bool _coolDown;
+	private bool reloaded = false;
 
 
 	public override void _Ready()
@@ -100,10 +101,12 @@ public partial class Weapon : Node3D
 
 	public async void ProccessPump_Action()
 	{
+		if (!reloaded) return;
 		_coolDown = true;
 		Fire();
-		await Task.Delay(500); // 500ms delay 
-		_coolDown = false;
+		reloaded = false;
+		await Task.Delay(500);
+		// 500ms delay 
 	}
 
 	public async Task ProcessFull_Auto()
@@ -124,10 +127,12 @@ public partial class Weapon : Node3D
 
 	public async void ProcessBolt_Action()
 	{
+		if (!reloaded) return;
 		_coolDown = true;
 		Fire();
-		await Task.Delay(800); // 800ms delay
-		_coolDown = false;
+		reloaded = false;
+		await Task.Delay(800);
+		// 800ms delay
 	}
 
 	public async void ProcessBurst_Action()
@@ -249,6 +254,23 @@ public partial class Weapon : Node3D
 		projectile.LinearVelocity = rayDirection * projectile.Speed;
 
 		// Play muzzle flash, sound effects, etc.
+	}
+	
+	
+	public void ResetManualAction()
+	{
+		switch (FireType)
+		{
+			case FiringType.Pump_Action:
+				reloaded = true;
+				break;
+			case FiringType.Bolt_Action:
+				
+				reloaded = true;
+				break;
+			default:
+				break;
+		}
 	}
 
 	public void ResetFire()

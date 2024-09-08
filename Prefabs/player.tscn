@@ -52,3 +52,5 @@ PlayerCamera = NodePath("..")
 Player = NodePath("../../../../..")
 
 [node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_co0g2")]
+ImpactForce = 75.0
+PlayerRecoilFactor = 75.0

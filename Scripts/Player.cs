@@ -139,11 +139,12 @@ public partial class Player : CharacterBody3D
 				_handle_air_physics(delta);
 			}
 		}
-
+		
 		if (!StepUpStairsCheck(delta))
 		{
 			_push_away_rigid_bodies(delta);
 			MoveAndSlide();
+			
 			SnapDownToStairsCheck();
 		}
 		
@@ -190,6 +191,8 @@ public partial class Player : CharacterBody3D
 	
 	private void _HandleWeaponSwitch(InputEvent @event)
 	{
+		if (Input.IsActionPressed("Reload"))
+			_weaponManager.GetCurrentWeapon().ResetManualAction();
 		if (Input.IsActionPressed("Weapon_1"))
 			_weaponManager.EquipWeapon(0);
 		if (Input.IsActionPressed("Weapon_2"))
@@ -255,16 +258,19 @@ public partial class Player : CharacterBody3D
 
 	void _handle_ground_physics(double delta)
 	{
+		
 		float fDelta = (float)delta;
 
 		// Sliding
-		if (_isCrouched && _inputDir.Length() > 0.5f && !_isSliding) 
+		if (_isCrouched && Input.IsActionPressed("Sprint") && _inputDir.Length() > 0.5f && !_isSliding) 
 		{
-			if (IsOnFloor()) // Check if the player is on the floor
+			if (IsOnFloor()) 
 			{
 				_isSliding = true;
 				Velocity = Velocity.Slide(GetFloorNormal()); 
-				Velocity = Velocity.Normalized() * _slideSpeed; // Slide at sprint speed
+				Velocity = Velocity.Normalized() * _slideSpeed; 
+				
+				_push_away_rigid_bodies(delta);
 			}
 		}
 
@@ -273,8 +279,8 @@ public partial class Player : CharacterBody3D
 			// Apply friction while sliding
 			Velocity = Velocity.Lerp(Vector3.Zero, _slideFriction * fDelta);
 
-			// End slide if player stops moving, uncrouches, or is no longer on the floor
-			if (_inputDir.Length() < 0.5f || !_isCrouched || !IsOnFloor())
+			// End slide if player stops moving, uncrouches, releases sprint, or is no longer on the floor
+			if (_inputDir.Length() < 0.5f || !_isCrouched || !Input.IsActionPressed("Sprint") || !IsOnFloor())
 			{
 				_isSliding = false;
 			}
@@ -300,6 +306,8 @@ public partial class Player : CharacterBody3D
 			}
 			Velocity *= newSpeed;
 		}
+
+		SnapDownToStairsCheck();
 
 		_headbob_effect(fDelta);
 	}
@@ -448,18 +456,20 @@ public partial class Player : CharacterBody3D
 
 	void _push_away_rigid_bodies(double delta)
 	{
-		for(int i = 0; i < GetSlideCollisionCount(); i++)
+		for (int i = 0; i < GetSlideCollisionCount(); i++)
 		{
 			KinematicCollision3D c = GetSlideCollision(i);
-			if(c.GetCollider().IsClass("RigidBody3D"))
+			if (c.GetCollider().IsClass("RigidBody3D"))
 			{
 				RigidBody3D rb = (RigidBody3D)c.GetCollider();
 				Vector3 push_dir = -c.GetNormal();
-				float velocity_diff_in_push_dir = GetVelocity().Dot(push_dir) - rb.GetLinearVelocity().Dot(push_dir);
+
+				// Use the current velocity after MoveAndSlide for the calculation
+				float velocity_diff_in_push_dir = Velocity.Dot(push_dir) - rb.GetLinearVelocity().Dot(push_dir); 
 				velocity_diff_in_push_dir = Mathf.Max(0.0f, velocity_diff_in_push_dir);
 
-				const float my_mass = 1.25f;
-				float mass_ratio = Mathf.Min(1.0f, my_mass / rb.GetMass());
+				
+				float mass_ratio = Mathf.Min(1.0f, _mass / rb.GetMass());
 				push_dir.Y = 0;
 				float push_force = mass_ratio * 5.0f;
 				rb.ApplyImpulse(push_dir * velocity_diff_in_push_dir * push_force, rb.GetPosition() - rb.GetGlobalPosition());

@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=4 uid="uid://bfok543wtqkkg"]
+[gd_scene load_steps=20 format=4 uid="uid://bfok543wtqkkg"]
 
 [ext_resource type="Material" uid="uid://iy3pyqt48fti" path="res://Shaders/Retro.tres" id="1_e1fsg"]
 [ext_resource type="Shader" path="res://Shaders/Skybox.gdshader" id="1_het5g"]
@@ -87,6 +87,9 @@ _data = {
 "octree_size": Vector3(256, 256, 256),
 "to_cell_xform": Transform3D(0.512, 0, 0, 0, 0.512, 0, 0, 0, 0.512, 128, 128, 128)
 }
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_w20hg"]
+absorbent = true
 
 [node name="Node2D" type="Node3D"]
 
@@ -211,12 +214,15 @@ data = SubResource("VoxelGIData_n6btv")
 
 [node name="RigidBody3D" parent="." instance=ExtResource("6_5mdmp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.8739, 0.804106, -6.02353)
+physics_material_override = SubResource("PhysicsMaterial_w20hg")
 
 [node name="RigidBody3D2" parent="." instance=ExtResource("6_5mdmp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.12488, 0.804106, -6.02353)
+physics_material_override = SubResource("PhysicsMaterial_w20hg")
 
 [node name="RigidBody3D3" parent="." instance=ExtResource("6_5mdmp")]
 transform = Transform3D(0.645071, -0.764123, 0, 0.764123, 0.645071, 0, 0, 0, 1, 7.46403, 2.06897, -6.02353)
+physics_material_override = SubResource("PhysicsMaterial_w20hg")
 
 [node name="Player" parent="." instance=ExtResource("7_iqiwq")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0110002, 3.22702)

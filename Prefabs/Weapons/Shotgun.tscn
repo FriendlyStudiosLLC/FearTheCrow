@@ -7,7 +7,10 @@
 [node name="Shotgun" type="Node3D"]
 script = ExtResource("1_irvy8")
 Modifiers = Array[Resource]([])
-FireType = 4
+FireType = 1
+BaseSprayRadius = 52.0
 Bullethole = ExtResource("2_vv8j3")
+PlayerRecoilFactor = 0.005
+Multi = true
 
 [node name="SM_Shotgun" parent="." instance=ExtResource("3_tggnp")]
