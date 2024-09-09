@@ -9,5 +9,7 @@ script = ExtResource("1_etj4i")
 Modifiers = Array[Resource]([])
 FireType = 4
 Bullethole = ExtResource("2_6ece8")
+ImpactForce = 75.0
+PlayerRecoilFactor = 75.0
 
 [node name="SM_Pistol" parent="." instance=ExtResource("3_vieig")]

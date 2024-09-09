@@ -5,7 +5,7 @@
 [resource]
 render_priority = 0
 shader = ExtResource("1_liljc")
-shader_parameter/subdivisions = 30.0
+shader_parameter/subdivisions = 300.0
 shader_parameter/grid_width = 0.02
 shader_parameter/background_color = Color(0.2, 0.2, 0.2, 1)
 shader_parameter/background_color_two = Color(0.1, 0.1, 0.1, 1)

@@ -10,6 +10,7 @@ Modifiers = Array[Resource]([])
 FireType = 1
 BaseSprayRadius = 52.0
 Bullethole = ExtResource("2_vv8j3")
+ImpactForce = 75.0
 PlayerRecoilFactor = 0.005
 Multi = true
 

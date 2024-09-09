@@ -8,3 +8,5 @@ script = ExtResource("1_o32t1")
 Modifiers = Array[Resource]([])
 FireType = 4
 Bullethole = ExtResource("2_jml37")
+ImpactForce = 75.0
+PlayerRecoilFactor = 75.0

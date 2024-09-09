@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://cneco1q2ups5j"]
+[gd_scene load_steps=6 format=3 uid="uid://cneco1q2ups5j"]
 
 [ext_resource type="Script" path="res://Scripts/Player.cs" id="1_bqchd"]
 [ext_resource type="Script" path="res://Scripts/Weapon/WeaponManager.cs" id="2_w8xyd"]
+[ext_resource type="PackedScene" uid="uid://bccd5y3mp2e7" path="res://Prefabs/Weapons/Revolver.tscn" id="3_4nikc"]
 [ext_resource type="PackedScene" uid="uid://ircwv7mhclq0" path="res://Prefabs/Weapons/Shotgun.tscn" id="3_co0g2"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xohxy"]
@@ -47,10 +48,10 @@ current = true
 [node name="WeaponMarker" type="Marker3D" parent="HeadOrigin/Head/Camera Smooth/Camera3D" node_paths=PackedStringArray("Weapons", "PlayerCamera", "Player")]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0.145, -0.15, -0.1)
 script = ExtResource("2_w8xyd")
-Weapons = [NodePath("Shotgun")]
+Weapons = [NodePath("Revolver"), NodePath("Shotgun")]
 PlayerCamera = NodePath("..")
 Player = NodePath("../../../../..")
 
+[node name="Revolver" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_4nikc")]
+
 [node name="Shotgun" parent="HeadOrigin/Head/Camera Smooth/Camera3D/WeaponMarker" instance=ExtResource("3_co0g2")]
-ImpactForce = 75.0
-PlayerRecoilFactor = 75.0
