@@ -1,37 +1,57 @@
 using Godot;
 using System;
 
-[Tool]
-public partial class Cone : Node3D
+[Tool][GlobalClass]
+public partial class SteerCast : Node3D
 {
     [Export] public Vector3 Origin = Vector3.Zero;
-    [Export] public Vector3 Direction = Vector3.Forward;
+    [Export] public Vector3 BaseDirection = Vector3.Forward;
+    [Export] public Vector3 SteerDirection;
     [Export] public float Length = 10.0f;
     [Export] public float Angle = Mathf.Pi / 4; // 45 degrees in radians
 
-    [Export] private RayCast3D ray = new RayCast3D();
     // Optional: Collision layers and masks
     [Export] public uint CollisionMask = 1; // Adjust as needed
     
     [Export] private float castInterval = 0.2f; // Adjust as needed
     [Export] private float _timeSinceLastRaycast = 0;
+    public bool _hitObject = false;
+    private bool _debug = true;
+    public bool enabled = true;
+
+    [Export]
+    public bool debug
+    {
+        get => _debug;
+        set
+        {
+            _debug = value;
+        }
+    }
 
     public override void _Ready()
     {
-        AddChild(ray);
+        
     }
     public override void _Process(double delta)
     {
+        if(!enabled) return;
         _timeSinceLastRaycast += (float)delta;
         if (_timeSinceLastRaycast >= castInterval) 
         {
+            
+            SteerDirection = BaseDirection;
             PerformHitscan();
             _timeSinceLastRaycast = 0;
         }
     }
 
+    
+
+
     public void PerformHitscan() 
     {
+        
         var spaceState = GetWorld3D().DirectSpaceState;
 
         var from = Origin;
@@ -39,14 +59,14 @@ public partial class Cone : Node3D
             (float)GD.RandRange(-Angle, Angle),
             (float)GD.RandRange(-Angle, Angle),
             Length));
-        ray.Position = from;
-        ray.TargetPosition = to;
+        
             
         var query = new PhysicsRayQueryParameters3D();
         query.From = from;
         query.To = to;
         query.CollisionMask = CollisionMask;
         var result = spaceState.IntersectRay(query);
+        SteerDirection = to;
 
         if (result.Keys.Contains("collider"))
         {
@@ -61,18 +81,22 @@ public partial class Cone : Node3D
                 var hit = result["collider"].AsGodotObject() as Node;
                 if (hit != null)
                 {
+                    _hitObject = true;
                     // ... (Apply decal, impulse, etc.)
+                }
+                else
+                {
+                    _hitObject = false;
                 }
             }
         }
 
-        
     }
 
     private bool IsPointInCone(Vector3 point)
     {
         var pointDirection = (point - Origin).Normalized();
-        var angleToPoint = Direction.AngleTo(pointDirection);
+        var angleToPoint = BaseDirection.AngleTo(pointDirection);
 
         return angleToPoint <= Angle / 2;
     }
