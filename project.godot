@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 DebugDraw="*res://addons/debug_drawing/DebugDraw.cs"
+AStarGrid3D="*res://Scripts/Enemy/AstarTest.cs"
 
 [dotnet]
 
@@ -32,6 +33,7 @@ enabled=PackedStringArray("res://addons/debug_drawing/plugin.cfg")
 [global_group]
 
 water_area=""
+Pathable=""
 
 [input]
 

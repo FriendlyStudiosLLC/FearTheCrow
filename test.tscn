@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=4 uid="uid://bfok543wtqkkg"]
+[gd_scene load_steps=42 format=4 uid="uid://bfok543wtqkkg"]
 
 [ext_resource type="Material" uid="uid://iy3pyqt48fti" path="res://Shaders/Retro.tres" id="1_e1fsg"]
 [ext_resource type="Shader" path="res://Shaders/Skybox.gdshader" id="1_het5g"]
@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" uid="uid://bisoag84mgc1h" path="res://Assets/Enemies/Roku/Roku.glb" id="14_jt501"]
 [ext_resource type="Material" uid="uid://ci0ntvtpk2bcu" path="res://Assets/Enemies/Spirit/M_Spirit.tres" id="14_wvq2l"]
 [ext_resource type="PackedScene" uid="uid://c7dkchccplvn7" path="res://FlyingEnemy.tscn" id="15_ti421"]
+[ext_resource type="Script" path="res://Scripts/Enemy/AstarTest.cs" id="16_p8d1s"]
+[ext_resource type="Script" path="res://Scripts/ObstacleContainer.cs" id="17_w7mkf"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_yle55"]
 shader = ExtResource("1_het5g")
@@ -186,6 +188,79 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_cw04y")
 
+[sub_resource type="SphereMesh" id="SphereMesh_cdv62"]
+radial_segments = 4
+rings = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_8lryp"]
+size = Vector3(4.78, 10.315, 12.89)
+
+[sub_resource type="Shader" id="Shader_mmfmo"]
+code = "shader_type spatial;
+render_mode unshaded;
+
+uniform sampler2D sky_texture : source_color;
+uniform bool lock_aspect = false;
+uniform float aspect_ratio = 1.3333333;
+uniform vec2 fov = vec2(180.0, 90.0);
+uniform ivec2 tiling = ivec2(1, 1);
+uniform vec2 offset = vec2(0.0, 0.0);
+
+varying vec4 BG_COORDS;
+
+void vertex() {
+	//Camera YX rotation per Basis.get_euler source code
+	float y = atan(VIEW_MATRIX[0][2], VIEW_MATRIX[2][2]);
+	float x = asin(VIEW_MATRIX[1][2]);
+
+	//Map rotation to screen space
+	BG_COORDS.xy = vec2(y * -0.5, x) / PI;
+	BG_COORDS.y += 0.5;
+
+	BG_COORDS.w = fov.y / 180.0;
+	BG_COORDS.z = !lock_aspect ? fov.x / 360.0 : VIEWPORT_SIZE.x / (VIEWPORT_SIZE.y * aspect_ratio) * BG_COORDS.w;
+
+	//Keep background centered vertically when FOV changes
+	BG_COORDS.y *= BG_COORDS.w > 1.0 ? 0.0 : 1.0 - BG_COORDS.w;
+}
+
+void fragment() {
+	vec2 uv_offset = vec2(-offset.x, offset.y);
+	vec2 uv = (SCREEN_UV + uv_offset) * BG_COORDS.zw + BG_COORDS.xy;
+	uv *= vec2(tiling);
+	ALBEDO = texture(sky_texture, uv).rgb;
+}"
+
+[sub_resource type="Gradient" id="Gradient_jx1lk"]
+offsets = PackedFloat32Array(0.80566, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_kpcaj"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_njrdy"]
+invert = true
+seamless = true
+seamless_blend_skirt = 1.0
+color_ramp = SubResource("Gradient_jx1lk")
+noise = SubResource("FastNoiseLite_kpcaj")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_otfnb"]
+render_priority = 0
+shader = SubResource("Shader_mmfmo")
+shader_parameter/lock_aspect = true
+shader_parameter/aspect_ratio = 1.33333
+shader_parameter/fov = Vector2(180, 90)
+shader_parameter/tiling = Vector2i(13, 13)
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/sky_texture = SubResource("NoiseTexture2D_njrdy")
+
+[sub_resource type="BoxMesh" id="BoxMesh_qmkg3"]
+flip_faces = true
+size = Vector3(43.125, 29.86, 40.935)
+
+[sub_resource type="BoxShape3D" id="1"]
+
+[sub_resource type="BoxMesh" id="2"]
+
 [node name="Node2D" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -228,23 +303,17 @@ material_override = SubResource("StandardMaterial3D_1sdov")
 use_collision = true
 size = Vector3(4.5, 4.5, 76.6169)
 
-[node name="CSGBox3D4" type="CSGBox3D" parent="."]
+[node name="CSGBox3D4" type="CSGBox3D" parent="." groups=["Pathable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
 material_override = ExtResource("2_b7l2h")
 size = Vector3(2, 2, 2)
 
-[node name="CSGBox3D7" type="CSGBox3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.104237, 0.688929, 28.9223)
-material_override = ExtResource("2_b7l2h")
-use_collision = true
-size = Vector3(2, 16.5928, 29.9089)
-
-[node name="CSGBox3D5" type="CSGBox3D" parent="."]
+[node name="CSGBox3D5" type="CSGBox3D" parent="." groups=["Pathable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.4, 0)
 material_override = ExtResource("2_b7l2h")
 size = Vector3(2, 2, 2)
 
-[node name="CSGBox3D6" type="CSGBox3D" parent="."]
+[node name="CSGBox3D6" type="CSGBox3D" parent="." groups=["Pathable"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.4, 0)
 material_override = ExtResource("2_b7l2h")
 size = Vector3(2, 2, 2)
@@ -362,5 +431,49 @@ skeleton = NodePath("")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.15501, 2.38419e-07, 6.1399)
 
 [node name="TestFlyingEnemy" parent="." instance=ExtResource("15_ti421")]
-transform = Transform3D(0.98805, 0.0238801, -0.152063, 0, 0.98783, 0.155149, 0.153922, -0.153291, 0.976116, -13.3834, 3.01961, 20.4863)
-Speed = 0.01
+transform = Transform3D(0.999967, 0, 0, 0, 0.999938, 0, 0, 0, 0.999998, -24.4378, 24.0753, 32.0962)
+velocity = Vector3(0, 0, 3.49999)
+Speed = 7.175
+TargetFactor = 0.001
+MaxSteerForce = 0.5
+targetMoveInterval = 5.0
+
+[node name="NavGridPoint" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4074, 8.57441, 21.4654)
+mesh = SubResource("SphereMesh_cdv62")
+skeleton = NodePath("")
+
+[node name="Astar" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 60.0289, 20.3596, 7.01465)
+script = ExtResource("16_p8d1s")
+grid_step = 5.0
+Points = {}
+grid_y = 0.0
+
+[node name="Node3D2" type="Node3D" parent="." groups=["Pathable", "pathable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 28.6473)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D2"]
+mesh = SubResource("BoxMesh_8lryp")
+
+[node name="Node3D3" type="Node3D" parent="." groups=["Pathable", "pathable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.2375, 0, 28.6473)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 18.2849, 0)
+material_override = SubResource("ShaderMaterial_otfnb")
+mesh = SubResource("BoxMesh_qmkg3")
+
+[node name="Obstacle" type="StaticBody3D" parent="."]
+transform = Transform3D(19.4924, 0, 0, 0, 11.3591, 0, 0, 0, 12.1116, -23.4542, 5.74203, 43.6219)
+script = ExtResource("17_w7mkf")
+
+[node name="CollisionShape" type="CollisionShape3D" parent="Obstacle"]
+shape = SubResource("1")
+
+[node name="MeshInstance" type="MeshInstance3D" parent="Obstacle"]
+mesh = SubResource("2")
+
+[connection signal="ready" from="Obstacle" to="Obstacle" method="create_obstacle"]
+[connection signal="tree_entered" from="Obstacle" to="Obstacle" method="create_obstacle"]
+[connection signal="tree_exited" from="Obstacle" to="Obstacle" method="remove_obstacle"]
