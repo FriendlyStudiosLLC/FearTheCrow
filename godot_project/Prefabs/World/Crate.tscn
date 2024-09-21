@@ -1,0 +1,23 @@
+[gd_scene load_steps=5 format=3 uid="uid://bn4q3y8d47yiu"]
+
+[ext_resource type="Texture2D" uid="uid://bbohvfepoxr0s" path="res://Assets/Props/Crate/crate.png" id="1_0hfdd"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stgd0"]
+albedo_texture = ExtResource("1_0hfdd")
+uv1_offset = Vector3(0.5, 0.5, 0.5)
+uv1_triplanar = true
+texture_filter = 0
+
+[sub_resource type="BoxMesh" id="BoxMesh_iv2ek"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_hki5p"]
+points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
+
+[node name="RigidBody3D" type="RigidBody3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+material_override = SubResource("StandardMaterial3D_stgd0")
+mesh = SubResource("BoxMesh_iv2ek")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_hki5p")

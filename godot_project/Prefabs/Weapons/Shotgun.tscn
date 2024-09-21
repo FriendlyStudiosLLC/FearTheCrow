@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://ircwv7mhclq0"]
+
+[ext_resource type="Script" path="res://Scripts/Weapon/Weapon.cs" id="1_irvy8"]
+[ext_resource type="PackedScene" uid="uid://cjqnxqtdtsvt" path="res://Prefabs/World/Bullethole_Default.tscn" id="2_vv8j3"]
+[ext_resource type="PackedScene" uid="uid://cdlebv74ulaxk" path="res://Prefabs/Weapons/Shotgun/SM_Shotgun.tscn" id="3_tggnp"]
+
+[node name="Shotgun" type="Node3D"]
+script = ExtResource("1_irvy8")
+Modifiers = Array[Resource]([])
+FireType = 1
+BaseSprayRadius = 52.0
+Bullethole = ExtResource("2_vv8j3")
+ImpactForce = 75.0
+PlayerRecoilFactor = 0.005
+Multi = true
+
+[node name="SM_Shotgun" parent="." instance=ExtResource("3_tggnp")]

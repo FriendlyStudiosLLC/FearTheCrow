@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="WeaponTrigger" load_steps=2 format=3 uid="uid://ddc2mftfiqsj8"]
+
+[ext_resource type="Script" path="res://Scripts/Weapon/WeaponTrigger.cs" id="1_f7pv7"]
+
+[resource]
+script = ExtResource("1_f7pv7")
+Type = 0
+Modifier = 0
