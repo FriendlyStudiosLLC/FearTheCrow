@@ -1,0 +1,13 @@
+[configuration]
+entry_symbol = "entrypoint"
+compatibility_minimum = 4.3
+reloadable = true
+
+[icons]
+Player = "res://bin/CONST-INT/Icons/Player.svg"
+InteractionComponent = "res://bin/CONST-INT/Icons/InteractionComponent.svg"
+
+[libraries]
+linux.debug.x86_64 = "CONST-INT.so"
+macos.debug = "CONST-INT.dylib"
+windows.debug.x86_64 = "CONST-INT.dll"

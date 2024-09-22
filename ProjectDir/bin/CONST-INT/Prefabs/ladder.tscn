@@ -1,0 +1,140 @@
+[gd_scene load_steps=5 format=3 uid="uid://dbl86f77x0j84"]
+
+[ext_resource type="Shader" path="res://Shaders/MetersGrid.gdshader" id="1_1xpnb"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_mmrq7"]
+render_priority = 0
+shader = ExtResource("1_1xpnb")
+shader_parameter/subdivisions = 32.0
+shader_parameter/grid_width = 0.02
+shader_parameter/background_color = Color(0.2, 0.2, 0.2, 1)
+shader_parameter/background_color_two = Color(0.1, 0.1, 0.1, 1)
+shader_parameter/grid_color = Color(0.5, 0.5, 0.5, 1)
+shader_parameter/dashed_scale_x = 0.02
+shader_parameter/dashed_scale_y = 0.02
+shader_parameter/dashed_count_x = 1.0
+shader_parameter/dashed_count_y = 1.0
+shader_parameter/point_width = 0.021
+shader_parameter/point_color = Color(0, 0, 0, 1)
+shader_parameter/point_scale_x = 0.05
+shader_parameter/point_scale_y = 0.05
+shader_parameter/inside_width = 0.01
+shader_parameter/inside_subdivisions = 6.0
+shader_parameter/inside_color = Color(0.4, 0.4, 0.4, 1)
+shader_parameter/in_dashed_scale_x = 0.3
+shader_parameter/in_dashed_scale_y = 0.3
+shader_parameter/in_dashed_count_x = 6.0
+shader_parameter/in_dashed_count_y = 6.0
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_umrbm"]
+size = Vector3(0.1, 15, 1.4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_youqv"]
+size = Vector3(1.4, 15, 0.8)
+
+[node name="Ladder" type="Node3D"]
+
+[node name="LadderVisual" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.233, 0, 0)
+
+[node name="Rung1" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -7, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung2" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -6, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung3" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -5, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung4" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -4, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung5" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -3, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung6" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -2, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung7" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, -1, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung8" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 0, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung9" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 1, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung10" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 2, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung11" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 3, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung12" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 4, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung13" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 5, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung14" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 6, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="Rung15" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.05, 7, 0)
+size = Vector3(0.1, 0.2, 1)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="LHandle" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0500028, 4.76837e-07, 0.599998)
+size = Vector3(0.1, 15, 0.2)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="RHandle" type="CSGBox3D" parent="LadderVisual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0500028, 4.76837e-07, -0.599998)
+size = Vector3(0.1, 15, 0.2)
+material = SubResource("ShaderMaterial_mmrq7")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.233, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0500002, 0, 0)
+shape = SubResource("BoxShape3D_umrbm")
+
+[node name="LadderArea3D" type="Area3D" parent="." groups=["ladder_area3d"]]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.467, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LadderArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.2)
+shape = SubResource("BoxShape3D_youqv")
+
+[node name="Ladder_Top" type="Node3D" parent="LadderArea3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.599998, 7.3, 0)

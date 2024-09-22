@@ -1,0 +1,23 @@
+# Jetbrains
+.idea/
+
+# Visual Studio
+.vs/
+out/
+
+# CMake
+cmake-build-*/
+
+# Godot
+.godot/
+
+# Compiled Dynamic libraries
+*.so
+*.os
+*.dll
+/cmake-build-debug/
+ProjectDir/screenshot2.png.import
+ProjectDir/screenshot2.png
+ProjectDir/screenshot.png.import
+ProjectDir/screenshot.png
+*.import

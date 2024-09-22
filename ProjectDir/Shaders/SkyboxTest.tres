@@ -1,0 +1,6 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://dx1gfohtblc5e"]
+
+[ext_resource type="Shader" path="res://Shaders/FTCSky.gdshader" id="1_2kw0y"]
+
+[resource]
+shader = ExtResource("1_2kw0y")

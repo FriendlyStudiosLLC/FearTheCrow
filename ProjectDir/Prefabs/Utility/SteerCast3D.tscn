@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://brjx88aw3uhaq"]
+
+[ext_resource type="Script" path="res://Scripts/Utility/SteerCast.cs" id="1_nk1lc"]
+
+[node name="Steercast" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.626334, 0)
+script = ExtResource("1_nk1lc")
+castInterval = 1.495
+_timeSinceLastRaycast = 0.87627
+
+[node name="RayCast3D" type="RayCast3D" parent="."]
+target_position = Vector3(-0.722812, 0.461361, 10)
+debug_shape_custom_color = Color(0.762808, 0, 0.29998, 1)
